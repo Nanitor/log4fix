@@ -138,31 +138,6 @@ func isSameFile(file1 *zip.File, file2 *zip.File) bool {
 		return false
 	}
 
-	// frc, _ := file1.Open()
-	// // if err != nil {
-	// // 	return false
-	// // }
-	// bufN := file1.FileInfo().Size()
-	// buf := make([]byte, bufN)
-	// n, _ := io.ReadFull(frc, buf)
-	// buf = buf[:n]
-	// defer frc.Close()
-
-	// frc2, _ := file1.Open()
-	// // if err != nil {
-	// // 	return false
-	// // }
-	// bufN2 := file2.FileInfo().Size()
-	// buf2 := make([]byte, bufN2)
-	// n2, _ := io.ReadFull(frc2, buf2)
-	// buf = buf[:n2]
-	// defer frc2.Close()
-
-	// if bufN != bufN2 {
-	// 	fmt.Println("BUFFER", bufN, bufN2)
-	// 	return false
-	// }
-
 	return true
 }
 
@@ -171,4 +146,4 @@ func remove(s []*zip.File, i int) []*zip.File {
 	return s[:len(s)-1]
 }
 
-// diff -y <(unzip -l test.jar) <(unzip -l log4j-core-2.9.0.jar)
+// diff -y <(unzip -l log4j-core-2.9.0.jar) <(unzip -l log4j-core-2.9.0-go.jar)

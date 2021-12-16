@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -112,27 +113,6 @@ func isVulnLog4JarArchive(rs io.ReadSeeker) (bool, string) {
 }
 
 func ArchiveVulnerableLog4shell(filePath string) (hasLog4Jar bool, isVuln bool, path string, err error) {
-
-	// // Add files to zip
-	// for _, file := range files {
-	// 	fmt.Println(file.Name)
-
-	// 	foundMatch := false
-	// 	for _, deleteFilename := range deleteFilenames {
-	// 		if deleteFilename == file.Name {
-	// 			fmt.Println("FOUNDIT!")
-	// 			foundMatch = true
-	// 			break
-	// 		}
-	// 	}
-	// 	if foundMatch {
-	// 		continue
-	// 	}
-	// 	if err = AddFileToZip(zipWriter, file); err != nil {
-	// 		return err
-	// 	}
-	// }
-
 	basename := filepath.Base(filePath)
 	isLog4Jar := log4jJarFileNames[basename]
 
@@ -143,6 +123,7 @@ func ArchiveVulnerableLog4shell(filePath string) (hasLog4Jar bool, isVuln bool, 
 	defer f.Close()
 	if isLog4Jar {
 		isVuln, path := isVulnLog4JarArchive(f)
+		fmt.Println(isVuln, path, filePath)
 		return true, isVuln, path, nil
 	}
 

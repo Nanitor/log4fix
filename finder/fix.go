@@ -61,34 +61,27 @@ func ZipFiles(deleteFilenames []string, filename string, files []*zip.File) erro
 	return nil
 }
 
+// Adds file to the new zip.
 func AddFileToZip(zipWriter *zip.Writer, file *zip.File) error {
 
-	// Get the file information
-	info := file.FileInfo()
+	zipItemReader, err := file.Open()
 
-	header, err := zip.FileInfoHeader(info)
 	if err != nil {
 		return err
 	}
 
-	// Using FileInfoHeader() above only uses the basename of the file. If we want
-	// to preserve the folder structure we can overwrite this with the full path.
+	header, err := zip.FileInfoHeader(file.FileInfo())
+	if err != nil {
+		return err
+	}
+
 	header.Name = file.Name
-
-	// Change to deflate to gain better compression
-	// see http://golang.org/pkg/archive/zip/#pkg-constants
-	header.Method = zip.Deflate
-
-	writer, err := zipWriter.CreateHeader(header)
+	targetItem, err := zipWriter.CreateHeader(header)
 	if err != nil {
 		return err
 	}
 
-	fileWriter, err := file.OpenRaw()
-	if err != nil {
-		return err
-	}
+	_, err = io.Copy(targetItem, zipItemReader)
 
-	_, err = io.Copy(writer, fileWriter)
 	return err
 }
