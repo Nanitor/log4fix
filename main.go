@@ -12,7 +12,8 @@ import (
 
 func main() {
 	app := cli.NewApp()
-	app.Usage = "Nanitor Agent"
+	app.Usage = "Log 4 Shell fix"
+	app.Version = "0.0.0"
 
 	app.Commands = []cli.Command{
 
