@@ -11,8 +11,15 @@ This tool is written in the Go programming language which means zero dependencie
 Download binaries (Darwin, Linux, OpenBSD, Windows) here https://github.com/nanitor/log4fix/releases/tag/v0.0.1.
 
 ## Usage
+
+Scan file for vulnerability
 ```
-./log4fix </path/to/file.war>
+./log4fix detect </path/to/file.war>
+```
+
+Scan file for vulnerability and remove the vulnerable class.
+```
+./log4fix fix </path/to/file.war> --overwrite
 ```
 
 ## Build from source
