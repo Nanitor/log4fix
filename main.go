@@ -1,9 +1,6 @@
 package main
 
 import (
-	"archive/zip"
-	"bytes"
-	"fmt"
 	"os"
 
 	"github.com/nanitor/log4fix/finder"
@@ -13,137 +10,85 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Usage = "Log 4 Shell fix"
-	app.Version = "0.0.0"
+	app.Version = "0.1.0"
 
 	app.Commands = []cli.Command{
 
 		{
-			Name:  "scan_jar_log4j",
+			Name:  "detect",
 			Usage: "Scan file system for log4j vulnerability",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "path",
-					Value: "",
-					Usage: "Full path the jar file to be scanned for vulnerability, e.g. /tmp/bigfix.jar",
-				},
-				&cli.BoolFlag{
-					Name:  "fix",
-					Usage: "Fix the vulnerability if it exists",
-				},
-			},
 			Action: func(c *cli.Context) {
-				warPath := c.String("path")
+				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify path to file as first argument.")
+				}
+				warPath := c.Args()[0]
 
 				if len(warPath) > 0 {
 					hasLog4Jar, isVuln, path, err := finder.ArchiveVulnerableLog4shell(warPath)
 					if err != nil {
-						fmt.Println(err)
-						os.Exit(1)
+						finder.ErrorLogger.Fatalf("%v\n", err)
 					}
 
 					if hasLog4Jar {
 						if isVuln {
-							fmt.Printf("Log4 jar file found - Vulnerable - has class\n PathToFile %s\n", path)
-
-							if c.Bool("fix") {
-								fmt.Printf("\nDeleting %s\n", path)
-								finder.FixFile(warPath, []string{path})
-							}
+							finder.InfoLogger.Println("Log4 jar file found - Vulnerable - has JndiLookup.class")
+							finder.InfoLogger.Printf("Path to vulnerable class: %s\n", path)
 						} else {
-							fmt.Printf("Log4 jar file found - NOT Vulnerable - missing class\n")
+							finder.InfoLogger.Printf("Log4 jar file found - NOT Vulnerable - missing class\n")
 						}
 					} else {
-						fmt.Printf("Not vulnerable\n")
+						finder.InfoLogger.Printf("Not vulnerable\n")
 					}
 				} else {
-					fmt.Println("Please set flags --path or --fdb")
+					finder.InfoLogger.Printf("Please give path to file as first argument.")
 				}
 			},
 		},
-
 		{
-			Name:  "diff_jar_files",
-			Usage: "Compare diff of two jar files",
-			Flags: []cli.Flag{},
+			Name:  "fix",
+			Usage: "Scan file system for log4j vulnerability and delete the vulnerable class. Note, this command overwrites the given file.",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "overwrite",
+					Usage: "This flag is necessary to give permission to overwrite the file.",
+				},
+			},
 			Action: func(c *cli.Context) {
-				files := c.Args()
-				file1 := files.Get(0)
-				file2 := files.Get(1)
-
-				buff, err := os.ReadFile(file1)
-				if err != nil {
-					fmt.Printf("Reading zip-file err: %v\n", err)
-					return
+				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify path to file as first argument.")
 				}
+				warPath := c.Args()[0]
 
-				r1, err := zip.NewReader(bytes.NewReader(buff), int64(len(buff)))
-				if err != nil {
-					fmt.Printf("Unzipping zip err: %v\n", err)
-					return
-				}
+				if len(warPath) > 0 {
+					if !c.Bool("overwrite") {
+						finder.WarningLogger.Fatalf("This command overwrites the given file. Please give overwrite permission by setting flag --overwrite")
+						return
+					}
 
-				buff, err = os.ReadFile(file2)
-				if err != nil {
-					fmt.Printf("Reading zip-file err: %v\n", err)
-					return
-				}
+					hasLog4Jar, isVuln, path, err := finder.ArchiveVulnerableLog4shell(warPath)
+					if err != nil {
+						finder.ErrorLogger.Fatalf("%v\n", err)
+					}
 
-				r2, err := zip.NewReader(bytes.NewReader(buff), int64(len(buff)))
-				if err != nil {
-					fmt.Printf("Unzipping zip err: %v\n", err)
-					return
-				}
-
-				onlyIn1 := []*zip.File{}
-				for _, rfile1 := range r1.File {
-					isIn2 := false
-					for j, rfile2 := range r2.File {
-						if isSameFile(rfile1, rfile2) {
-							r2.File = remove(r2.File, j)
-							isIn2 = true
-							break
+					if hasLog4Jar {
+						if isVuln {
+							finder.InfoLogger.Println("Log4 jar file found - Vulnerable - has JndiLookup.class")
+							finder.InfoLogger.Printf("Class to be deleted: %s\n", path)
+							finder.FixFile(warPath, []string{path})
+						} else {
+							finder.InfoLogger.Printf("Log4 jar file found - NOT Vulnerable - missing class\n")
 						}
+					} else {
+						finder.InfoLogger.Printf("Not vulnerable\n")
 					}
-
-					if !isIn2 {
-						onlyIn1 = append(onlyIn1, rfile1)
-					}
+				} else {
+					finder.InfoLogger.Printf("Please give path to file as first argument.")
 				}
-
-				if len(onlyIn1) > 0 {
-					fmt.Printf("\nFiles only in %s:\n\n", file1)
-					for _, file := range onlyIn1 {
-						fmt.Printf("%s\n", file.Name)
-					}
-				}
-
-				if len(r2.File) > 0 {
-					fmt.Printf("\nFiles only in %s:\n\n", file2)
-
-					for _, file := range r2.File {
-						fmt.Printf("%s\n", file.Name)
-					}
-					fmt.Println()
-				}
-
 			},
 		},
 	}
 
 	app.Run(os.Args)
 }
-
-func isSameFile(file1 *zip.File, file2 *zip.File) bool {
-	if file1.Name != file2.Name {
-		return false
-	}
-
-	return true
-}
-
-func remove(s []*zip.File, i int) []*zip.File {
-	s[i] = s[len(s)-1]
-	return s[:len(s)-1]
-}
-
-// diff -y <(unzip -l log4j-core-2.9.0.jar) <(unzip -l log4j-core-2.9.0-go.jar)

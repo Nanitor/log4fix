@@ -4,14 +4,13 @@ import (
 	"archive/zip"
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-var log4jJarFileNames = map[string]bool{
+var Log4jJarFileNames = map[string]bool{
 	"log4j-core-2.0-alpha1.jar": true,
 	"log4j-core-2.0-alpha2.jar": true,
 	"log4j-core-2.0-beta1.jar":  true,
@@ -97,7 +96,6 @@ func isVulnLog4JarArchive(rs io.ReadSeeker) (bool, string) {
 		}
 		baseName := filepath.Base(file.Name)
 
-		// org/apache/logging/log4j/core/lookup/JndiLookup.class
 		if strings.ToLower(baseName) == `jndilookup.class` {
 			path = file.Name
 			hasClass = true
@@ -114,7 +112,7 @@ func isVulnLog4JarArchive(rs io.ReadSeeker) (bool, string) {
 
 func ArchiveVulnerableLog4shell(filePath string) (hasLog4Jar bool, isVuln bool, path string, err error) {
 	basename := filepath.Base(filePath)
-	isLog4Jar := log4jJarFileNames[basename]
+	isLog4Jar := Log4jJarFileNames[basename]
 
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -123,14 +121,15 @@ func ArchiveVulnerableLog4shell(filePath string) (hasLog4Jar bool, isVuln bool, 
 	defer f.Close()
 	if isLog4Jar {
 		isVuln, path := isVulnLog4JarArchive(f)
-		fmt.Println(isVuln, path, filePath)
 		return true, isVuln, path, nil
 	}
 
 	vulnerable := false
 	hasLog4Jar = false
 	pathToVulnFile := ""
+
 	traverseArchive(f, func(file *zip.File) error {
+
 		if file.FileInfo().IsDir() {
 			return nil
 		}
@@ -139,7 +138,7 @@ func ArchiveVulnerableLog4shell(filePath string) (hasLog4Jar bool, isVuln bool, 
 			return nil
 		}
 		basename := strings.ToLower(filepath.Base(file.Name))
-		isLog4Jar := log4jJarFileNames[basename]
+		isLog4Jar := Log4jJarFileNames[basename]
 		if isLog4Jar {
 			hasLog4Jar = true
 			frc, err := file.Open()
