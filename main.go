@@ -19,17 +19,6 @@ func main() {
 		{
 			Name:  "detect",
 			Usage: "Scan file system for log4j vulnerability",
-			Flags: []cli.Flag{
-				&cli.StringFlag{
-					Name:  "path",
-					Value: "",
-					Usage: "Full path the jar file to be scanned for vulnerability, e.g. /tmp/bigfix.jar",
-				},
-				&cli.BoolFlag{
-					Name:  "fix",
-					Usage: "Fix the vulnerability if it exists",
-				},
-			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
 				warPath := c.Args()[0]
@@ -58,7 +47,6 @@ func main() {
 		{
 			Name:  "fix",
 			Usage: "Scan file system for log4j vulnerability and delete the vulnerable class. Note, this command overwrites the given file.",
-			Flags: []cli.Flag{},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
 				warPath := c.Args()[0]
