@@ -116,7 +116,6 @@ func createLog4JarWithoutJndi(file *zip.File, deleteFilenames []string) (string,
 	}
 
 	tempJarPath := tempPrefix + filepath.Base(file.Name)
-
 	// ReadAll reads from readCloser until EOF and returns the data as a []byte
 	b, err := ioutil.ReadAll(fr) // The readCloser is the one from the zip-package
 	if err != nil {

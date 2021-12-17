@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
 	"github.com/nanitor/log4fix/finder"
 	"github.com/urfave/cli"
@@ -21,6 +19,9 @@ func main() {
 			Usage: "Scan file system for log4j vulnerability",
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify path to file as first argument.")
+				}
 				warPath := c.Args()[0]
 
 				if len(warPath) > 0 {
@@ -47,17 +48,22 @@ func main() {
 		{
 			Name:  "fix",
 			Usage: "Scan file system for log4j vulnerability and delete the vulnerable class. Note, this command overwrites the given file.",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "overwrite",
+					Usage: "This flag is necessary to give permission to overwrite the file.",
+				},
+			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify path to file as first argument.")
+				}
 				warPath := c.Args()[0]
 
 				if len(warPath) > 0 {
-					fmt.Print("This action overwrites the file. Are you sure? [y/n]: ")
-					var input string
-					fmt.Scanln(&input)
-
-					if strings.ToLower(input) != "y" {
-						fmt.Println("quitting...")
+					if !c.Bool("overwrite") {
+						finder.WarningLogger.Fatalf("This command overwrites the given file. Please give overwrite permission by setting flag --overwrite")
 						return
 					}
 
