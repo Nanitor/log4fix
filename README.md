@@ -8,7 +8,7 @@ This tool has been tested on:
 This tool is written in the Go programming language which means zero dependencies and standalone binaries which will run everywhere.
 
 ## Install
-Download binaries (Windows, Linux, Darwin, OpenBSD) here https://github.com/nanitor/log4fix/releases/tag/v0.1.0
+Download binaries (Windows, Linux, Darwin, OpenBSD) here https://github.com/nanitor/log4fix/releases/tag/v3.0.1
 
 ## Usage
 
