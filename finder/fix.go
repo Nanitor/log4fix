@@ -114,6 +114,7 @@ func createLog4JarWithoutJndi(file *zip.File, deleteFilenames []string) (string,
 	if err != nil {
 		return "", err
 	}
+	defer fr.Close()
 
 	tempJarPath := tempPrefix + filepath.Base(file.Name)
 	// ReadAll reads from readCloser until EOF and returns the data as a []byte
@@ -189,6 +190,7 @@ func AddFileToZip(zipWriter *zip.Writer, file *zip.File) error {
 	if err != nil {
 		return err
 	}
+	defer zipItemReader.Close()
 
 	header, err := zip.FileInfoHeader(file.FileInfo())
 	if err != nil {
