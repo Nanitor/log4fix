@@ -10,7 +10,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Usage = "Log 4 Shell fix"
-	app.Version = "0.1.0"
+	app.Version = "3.0.1"
 
 	app.Commands = []cli.Command{
 
