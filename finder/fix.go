@@ -107,6 +107,8 @@ func FixFile(zipPath string, filesToSkip []string) {
 		ErrorLogger.Printf("%v\n", err)
 		return
 	}
+
+	InfoLogger.Printf("File removed: %s\n", filesToSkip[0])
 }
 
 func createLog4JarWithoutJndi(file *zip.File, deleteFilenames []string) (string, error) {

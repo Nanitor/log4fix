@@ -75,8 +75,9 @@ func main() {
 					if hasLog4Jar {
 						if isVuln {
 							finder.InfoLogger.Println("Log4 jar file found - Vulnerable - has JndiLookup.class")
-							finder.InfoLogger.Printf("Class to be deleted: %s\n", path)
+
 							finder.FixFile(warPath, []string{path})
+
 						} else {
 							finder.InfoLogger.Printf("Log4 jar file found - NOT Vulnerable - missing class\n")
 						}

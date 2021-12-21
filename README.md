@@ -14,12 +14,12 @@ Download binaries (Windows, Linux, Darwin, OpenBSD) here https://github.com/nani
 
 Scan file for vulnerability
 ```
-./log4fix detect </path/to/file.war>
+./bin/log4fix detect </path/to/file.war>
 ```
 
 Scan file for vulnerability and remove the vulnerable class.
 ```
-./log4fix fix </path/to/file.war> --overwrite
+./bin/log4fix fix </path/to/file.war> --overwrite
 ```
 
 We recommend taking a backup of the files prior to overwriting them.
