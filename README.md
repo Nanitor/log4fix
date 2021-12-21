@@ -12,6 +12,8 @@ Download binaries (Windows, Linux, Darwin, OpenBSD) here https://github.com/nani
 
 ## Usage
 
+[![asciicast](https://asciinema.org/a/kQVtPYoz07W9MF8PidmYxQluy.svg)](https://asciinema.org/a/kQVtPYoz07W9MF8PidmYxQluy)
+
 Scan file for vulnerability
 ```
 ./bin/log4fix detect </path/to/file.war>
