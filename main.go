@@ -100,6 +100,7 @@ func main() {
 					finder.ErrorLogger.Fatalf("Please specify path to directory as first argument.")
 				}
 				rootDir := c.Args()[0]
+				finder.InfoLogger.Printf("scanning...\n")
 				paths, err := finder.Scan(rootDir)
 				if err != nil {
 					finder.ErrorLogger.Fatalf("%v\n", err)
