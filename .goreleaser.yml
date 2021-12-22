@@ -16,6 +16,7 @@ builds:
   - openbsd
   - freebsd
   goarch:
+  - arm64
   - amd64
   - 386
   env:
