@@ -22,6 +22,11 @@ Scan file for vulnerability and remove the vulnerable class.
 ./bin/log4fix fix </path/to/file.war> --overwrite
 ```
 
+Scan directory for vulnerability.
+```
+./bin/log4fix scan </path/to/dir>
+```
+
 We recommend taking a backup of the files prior to overwriting them.
 On Windows, it may be necessary to stop the service prior to applying the fix.
 Once the fix has been applied, the service should be restarted.
