@@ -10,10 +10,11 @@ import (
 func Scan(dirPath string) ([]string, error) {
 	compressedFiles := []string{}
 	r, _ := regexp.Compile(`.*\.(jar|war|ear)`)
-	err := filepath.Walk(dirPath,
+	filepath.Walk(dirPath,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				return err
+				ErrorLogger.Printf("%v\n", err)
+				return nil
 			}
 			filename := filepath.Base(path)
 
@@ -22,8 +23,5 @@ func Scan(dirPath string) ([]string, error) {
 			}
 			return nil
 		})
-	if err != nil {
-		return compressedFiles, err
-	}
 	return compressedFiles, nil
 }

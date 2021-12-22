@@ -120,7 +120,8 @@ func main() {
 					finder.InfoLogger.Printf("Scanning %s for log4j\n", path)
 					hasLog4Jar, isVuln, vulnPath, err := finder.ArchiveVulnerableLog4shell(path)
 					if err != nil {
-						finder.ErrorLogger.Fatalf("err: %v\n", err)
+						finder.ErrorLogger.Printf("err: %v\n", err)
+						continue
 					}
 
 					if hasLog4Jar {
