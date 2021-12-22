@@ -98,6 +98,10 @@ func main() {
 					Name:  "fix",
 					Usage: "If this flag is present the command scans the directory and removes all instances of the vulnerable class.",
 				},
+				&cli.StringFlag{
+					Name:  "output",
+					Usage: "Write the path to the vulnerable files into the given file.",
+				},
 			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
@@ -145,8 +149,24 @@ func main() {
 
 				if len(vulnFiles) > 0 && !c.Bool("fix") {
 					finder.InfoLogger.Println("Run the following to fix the files:")
+
+					var f *os.File
+					if c.IsSet("output") {
+						var err error
+						f, err = os.Create(c.String("output"))
+						if err != nil {
+							finder.ErrorLogger.Printf("%v\n", err)
+						} else {
+							defer f.Close()
+						}
+					}
+
 					for _, filepath := range vulnFiles {
 						fmt.Printf("\t log4fix fix %s --overwrite\n", filepath)
+
+						if f != nil {
+							f.WriteString(filepath + "\n")
+						}
 					}
 
 					finder.InfoLogger.Println("Or run this command with flag --fix")
