@@ -1,0 +1,5 @@
+/Users/thorduragustsson/Desktop/test/log4j-core-2.9.0.jar
+/Users/thorduragustsson/Desktop/test/parent/log4j-core-2.9.0.jar
+/Users/thorduragustsson/Desktop/test/parent.war
+/Users/thorduragustsson/Desktop/test/parent2/log4j-core-2.9.0.jar
+/Users/thorduragustsson/Desktop/test/parent2.jar
