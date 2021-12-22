@@ -115,6 +115,8 @@ func main() {
 					finder.ErrorLogger.Fatalf("%v\n", err)
 				}
 
+				finder.InfoLogger.Printf("Number of war/jar/ear files found: %d\n", len(paths))
+
 				vulnFiles := []string{}
 				for _, path := range paths {
 					finder.InfoLogger.Printf("Scanning %s for log4j\n", path)
@@ -143,7 +145,6 @@ func main() {
 					fmt.Println()
 				}
 
-				finder.InfoLogger.Printf("Number of war/jar/ear files: %d\n", len(paths))
 				finder.InfoLogger.Printf("Number of war/jar/ear files containing log4j vulnerability: %d\n", len(vulnFiles))
 
 				fmt.Println()
