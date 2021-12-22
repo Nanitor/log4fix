@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/nanitor/log4fix/finder"
@@ -16,7 +17,7 @@ func main() {
 
 		{
 			Name:  "detect",
-			Usage: "Scan file system for log4j vulnerability",
+			Usage: "Scan compressed file for log4j vulnerability",
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
 				if len(c.Args()) == 0 {
@@ -47,7 +48,7 @@ func main() {
 		},
 		{
 			Name:  "fix",
-			Usage: "Scan file system for log4j vulnerability and delete the vulnerable class. Note, this command overwrites the given file.",
+			Usage: "Scan compressed file for log4j vulnerability and delete the vulnerable class. Note, this command overwrites the given file.",
 			Flags: []cli.Flag{
 				&cli.BoolFlag{
 					Name:  "overwrite",
@@ -87,6 +88,59 @@ func main() {
 				} else {
 					finder.InfoLogger.Printf("Please give path to file as first argument.")
 				}
+			},
+		},
+		{
+			Name:  "scan",
+			Usage: "Scan file system for log4j vulnerability.",
+			Flags: []cli.Flag{
+				&cli.BoolFlag{
+					Name:  "overwrite",
+					Usage: "This flag is necessary to give permission to overwrite files found that contain the vulnerability.",
+				},
+			},
+			Action: func(c *cli.Context) {
+				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify path to directory as first argument.")
+				}
+				warPath := c.Args()[0]
+				paths, err := finder.Scan(warPath)
+				if err != nil {
+					finder.ErrorLogger.Fatalf("%v\n", err)
+				}
+
+				numVuln := 0
+				numVulnFixed := 0
+				for _, path := range paths {
+					finder.InfoLogger.Printf("Scanning %s for log4j\n", path)
+					hasLog4Jar, isVuln, vulnPath, err := finder.ArchiveVulnerableLog4shell(path)
+					if err != nil {
+						finder.ErrorLogger.Fatalf("err: %v\n", err)
+					}
+
+					if hasLog4Jar {
+						if isVuln {
+							finder.InfoLogger.Printf("Log4 jar file found - Vulnerable - has JndiLookup.class\n")
+							numVuln++
+							if c.Bool("overwrite") {
+								finder.InfoLogger.Printf("Removing class %s\n", vulnPath)
+								finder.FixFile(path, []string{vulnPath})
+								numVulnFixed++
+							}
+						} else {
+							finder.InfoLogger.Printf("Log4 jar file found - NOT Vulnerable - missing JndiLookup.class\n")
+						}
+					} else {
+						finder.InfoLogger.Printf("Not vulnerable\n")
+					}
+
+					fmt.Println()
+				}
+
+				finder.InfoLogger.Printf("Number of war/jar/ear files: %d\n", len(paths))
+				finder.InfoLogger.Printf("Number of war/jar/ear files containing log4j vulnerability: %d\n", numVuln)
+				finder.InfoLogger.Printf("Number of war/jar/ear files log4j fixed: %d\n", numVulnFixed)
 			},
 		},
 	}
