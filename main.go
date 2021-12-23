@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/gosuri/uilive"
 	"github.com/nanitor/log4fix/finder"
 	"github.com/urfave/cli"
 )
@@ -102,20 +104,24 @@ func main() {
 					Name:  "output",
 					Usage: "Write the path to the vulnerable files into the given file.",
 				},
+				&cli.BoolFlag{
+					Name:  "debug",
+					Usage: "If present non-silence the logs.",
+				},
 			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
+				if !c.Bool("debug") {
+					finder.Silent()
+				}
 				if len(c.Args()) == 0 {
 					finder.ErrorLogger.Fatalf("Please specify path to directory as first argument.")
 				}
 				rootDir := c.Args()[0]
-				finder.InfoLogger.Printf("scanning...\n")
 				paths, err := finder.Scan(rootDir)
 				if err != nil {
 					finder.ErrorLogger.Fatalf("%v\n", err)
 				}
-
-				finder.InfoLogger.Printf("Number of war/jar/ear files found: %d\n", len(paths))
 
 				vulnFiles := []string{}
 				for _, path := range paths {
@@ -142,7 +148,10 @@ func main() {
 						finder.InfoLogger.Printf("Not vulnerable\n")
 					}
 
-					fmt.Println()
+					if c.Bool("debug") {
+						fmt.Println()
+					}
+
 				}
 
 				finder.InfoLogger.Printf("Number of war/jar/ear files containing log4j vulnerability: %d\n", len(vulnFiles))
@@ -150,7 +159,8 @@ func main() {
 				fmt.Println()
 
 				if len(vulnFiles) > 0 && !c.Bool("fix") {
-					finder.InfoLogger.Println("Run the following to fix the files:")
+					fmt.Printf("Found %d vulnerable classes\n", len(vulnFiles))
+					fmt.Println("Run the following to remove them:")
 
 					var f *os.File
 					if c.IsSet("output") {
@@ -171,9 +181,28 @@ func main() {
 						}
 					}
 
-					finder.InfoLogger.Println("Or run this command with flag --fix")
+					fmt.Println("Or run this command with flag --fix")
+					fmt.Println()
 				}
 
+			},
+		},
+		{
+			Name:  "test",
+			Usage: "test live.",
+			Flags: []cli.Flag{},
+			Action: func(c *cli.Context) {
+				writer := uilive.New()
+				// start listening for updates and render
+				writer.Start()
+
+				for i := 0; i <= 100; i++ {
+					fmt.Fprintf(writer, "Downloading.. (%d/%d) GB\n", i, 100)
+					time.Sleep(time.Millisecond * 5)
+				}
+
+				fmt.Fprintln(writer, "Finished: Downloaded 100GB")
+				writer.Stop() //
 			},
 		},
 	}
