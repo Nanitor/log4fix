@@ -3,9 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/gosuri/uilive"
 	"github.com/nanitor/log4fix/finder"
 	"github.com/urfave/cli"
 )
@@ -185,24 +183,6 @@ func main() {
 					fmt.Println()
 				}
 
-			},
-		},
-		{
-			Name:  "test",
-			Usage: "test live.",
-			Flags: []cli.Flag{},
-			Action: func(c *cli.Context) {
-				writer := uilive.New()
-				// start listening for updates and render
-				writer.Start()
-
-				for i := 0; i <= 100; i++ {
-					fmt.Fprintf(writer, "Downloading.. (%d/%d) GB\n", i, 100)
-					time.Sleep(time.Millisecond * 5)
-				}
-
-				fmt.Fprintln(writer, "Finished: Downloaded 100GB")
-				writer.Stop() //
 			},
 		},
 	}
