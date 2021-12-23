@@ -16,27 +16,32 @@ Download binaries (Windows, Linux, Darwin, OpenBSD) here https://github.com/nani
 
 Scan file for vulnerability
 ```
-./bin/log4fix detect </path/to/file.war>
+log4fix detect </path/to/file.war>
 ```
 
 Scan file for vulnerability and remove the vulnerable class.
 ```
-./bin/log4fix fix </path/to/file.war> --overwrite
+log4fix fix </path/to/file.war> --overwrite
 ```
 
-Scan directory for vulnerability.
+Scan single directory for vulnerability.
 ```
-./bin/log4fix scan </path/to/dir>
+log4fix scan </path/to/dir>
+```
+
+Scan multiple directories for vulnerability.
+```
+log4fix scan </path/to/dir/1> </path/to/dir/2>
 ```
 
 Scan directory for vulnerability and remove the vulnerable files. Note, this command overwrites the war/ear/jar files containing the vulnerable class that are found.
 ```
-./bin/log4fix scan </path/to/dir> --fix
+log4fix scan </path/to/dir> --fix
 ```
 
 Scan directory for vulnerability and write the vulnerable jar/ear/war files found into the file supplied.
 ```
-./bin/log4fix scan </path/to/dir> --output </path/to/text/file.txt>
+log4fix scan </path/to/dir> --output </path/to/text/file.txt>
 ```
 
 We recommend taking a backup of the files prior to overwriting them.

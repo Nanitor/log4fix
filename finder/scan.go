@@ -19,9 +19,14 @@ func Scan(dirPaths []string) ([]string, error) {
 
 func ScanDir(dirPath string) ([]string, error) {
 	compressedFiles := []string{}
-	r, _ := regexp.Compile(`.*\.(jar|war|ear)`)
+	rJar, _ := regexp.Compile(`.*\.jar`)
+	rWar, _ := regexp.Compile(`.*\.war`)
+	rEar, _ := regexp.Compile(`.*\.ear`)
 	fileCount := 0
 	errCount := 0
+	jarFileCount := 0
+	warFileCount := 0
+	earCount := 0
 
 	fmt.Printf("\nScanning %s\n\n", dirPath)
 	IOLogger.Printf("Scanning %s\n", dirPath)
@@ -33,24 +38,32 @@ func ScanDir(dirPath string) ([]string, error) {
 
 				ErrorLogger.Printf("%v\n", err)
 				if fileCount%1000 == 0 {
-					IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of JAR/WAR/EAR found: %d\n", fileCount, errCount, len(compressedFiles))
+					IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of .JAR found: %d\nNumber of .WAR found: %d\nNumber of .EAR found: %d\n", fileCount, errCount, jarFileCount, warFileCount, earCount)
 				}
 
 				return nil
 			}
 
-			if fileCount%1000 == 0 {
-				IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of JAR/WAR/EAR found: %d\n", fileCount, errCount, len(compressedFiles))
+			filename := filepath.Base(path)
+
+			if rJar.MatchString(filename) {
+				compressedFiles = append(compressedFiles, path)
+				jarFileCount++
+			} else if rWar.MatchString(filename) {
+				compressedFiles = append(compressedFiles, path)
+				warFileCount++
+			} else if rEar.MatchString(filename) {
+				compressedFiles = append(compressedFiles, path)
+				earCount++
 			}
 
-			filename := filepath.Base(path)
-			if r.MatchString(filename) {
-				compressedFiles = append(compressedFiles, path)
+			if fileCount%1000 == 0 {
+				IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of .JAR found: %d\nNumber of .WAR found: %d\nNumber of .EAR found: %d\n", fileCount, errCount, jarFileCount, warFileCount, earCount)
 			}
 			return nil
 		})
 
-	IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of JAR/WAR/EAR found: %d\n", fileCount, errCount, len(compressedFiles))
+	IOLogger.Printf("Number of files scanned: %d \nNumber of files unable to access: %d\nNumber of .JAR found: %d\nNumber of .WAR found: %d\nNumber of .EAR found: %d\n", fileCount, errCount, jarFileCount, warFileCount, earCount)
 	IOLogger.Close()
 
 	return compressedFiles, nil
