@@ -8,13 +8,23 @@ import (
 )
 
 // Finds war, ear and jar files and returns their absolute paths.
-func Scan(dirPath string) ([]string, error) {
+func Scan(dirPaths []string) ([]string, error) {
+	compressedFiles := []string{}
+	for _, dirPath := range dirPaths {
+		files, _ := ScanDir(dirPath)
+		compressedFiles = append(compressedFiles, files...)
+	}
+	return compressedFiles, nil
+}
+
+func ScanDir(dirPath string) ([]string, error) {
 	compressedFiles := []string{}
 	r, _ := regexp.Compile(`.*\.(jar|war|ear)`)
 	fileCount := 0
 	errCount := 0
 
-	fmt.Println()
+	fmt.Printf("\nScanning %s\n\n", dirPath)
+	IOLogger.Printf("Scanning %s\n", dirPath)
 	filepath.Walk(dirPath,
 		func(path string, info os.FileInfo, err error) error {
 			fileCount++
