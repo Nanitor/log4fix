@@ -109,14 +109,16 @@ func main() {
 			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
+				if len(c.Args()) == 0 {
+					finder.ErrorLogger.Fatalf("Please specify paths to directories as argument. i.e. 'log4fix scan </path/to/dir/1> </path/to/dir/2>'")
+				}
 				if !c.Bool("debug") {
 					finder.Silent()
 				}
-				if len(c.Args()) == 0 {
-					finder.ErrorLogger.Fatalf("Please specify path to directory as first argument.")
-				}
-				rootDir := c.Args()[0]
-				paths, err := finder.Scan(rootDir)
+
+				rootDirs := []string{c.Args().First()}
+				rootDirs = append(rootDirs, c.Args().Tail()...)
+				paths, err := finder.Scan(rootDirs)
 				if err != nil {
 					finder.ErrorLogger.Fatalf("%v\n", err)
 				}
