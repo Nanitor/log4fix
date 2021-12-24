@@ -1,7 +1,6 @@
 package finder
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -28,7 +27,7 @@ func ScanDir(dirPath string) ([]string, error) {
 	warFileCount := 0
 	earCount := 0
 
-	fmt.Printf("\nScanning %s\n\n", dirPath)
+	Printf("\nScanning %s\n\n", dirPath)
 	IOLogger.Printf("Scanning %s\n", dirPath)
 	filepath.Walk(dirPath,
 		func(path string, info os.FileInfo, err error) error {

@@ -21,6 +21,7 @@ func LoggerInit() {
 	ErrorLogger = log.New(os.Stdout, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 	IOLogger = LiveLogger{}
 }
+
 func Silent() {
 	InfoLogger.SetFlags(0)
 	InfoLogger.SetOutput(ioutil.Discard)
@@ -32,16 +33,18 @@ func Silent() {
 	WarningLogger.SetOutput(ioutil.Discard)
 }
 
+func ShouldQuietLogging(shouldQuiet bool) {
+	quiet = shouldQuiet
+}
+
 type LiveLogger struct {
 	*goterminal.Writer
 }
 
 var IOLogger LiveLogger
-
-var TextChan chan string
+var quiet = false
 
 func (l *LiveLogger) Init() {
-	TextChan = make(chan string)
 	l.Writer = goterminal.New(os.Stdout)
 }
 
@@ -53,6 +56,9 @@ func (l *LiveLogger) Close() {
 }
 
 func (l *LiveLogger) Printf(text string, args ...interface{}) {
+	if quiet {
+		return
+	}
 	if l.Writer == nil {
 		l.Init()
 	}
@@ -62,10 +68,27 @@ func (l *LiveLogger) Printf(text string, args ...interface{}) {
 }
 
 func (l *LiveLogger) Println(text string) {
+	if quiet {
+		return
+	}
 	if l.Writer == nil {
 		l.Init()
 	}
 	l.Writer.Clear()
 	fmt.Fprintln(l.Writer, text)
 	l.Writer.Print()
+}
+
+func Printf(text string, args ...interface{}) {
+	if quiet {
+		return
+	}
+	fmt.Printf(text, args...)
+}
+
+func Println(text string) {
+	if quiet {
+		return
+	}
+	fmt.Println(text)
 }

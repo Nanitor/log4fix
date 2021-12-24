@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/nanitor/log4fix/finder"
@@ -106,6 +105,10 @@ func main() {
 					Name:  "debug",
 					Usage: "If present non-silence the logs.",
 				},
+				&cli.BoolFlag{
+					Name:  "quiet",
+					Usage: "No logging to stdout.",
+				},
 			},
 			Action: func(c *cli.Context) {
 				finder.LoggerInit()
@@ -115,6 +118,8 @@ func main() {
 				if !c.Bool("debug") {
 					finder.Silent()
 				}
+
+				finder.ShouldQuietLogging(c.Bool("quiet"))
 
 				rootDirs := []string{c.Args().First()}
 				rootDirs = append(rootDirs, c.Args().Tail()...)
@@ -149,18 +154,18 @@ func main() {
 					}
 
 					if c.Bool("debug") {
-						fmt.Println()
+						finder.Println("")
 					}
 
 				}
 
 				finder.InfoLogger.Printf("Number of war/jar/ear files containing log4j vulnerability: %d\n", len(vulnFiles))
 
-				fmt.Println()
+				finder.Println("")
 
 				if len(vulnFiles) > 0 && !c.Bool("fix") {
-					fmt.Printf("Found %d vulnerable classes\n", len(vulnFiles))
-					fmt.Println("Run the following to remove them:")
+					finder.Printf("Found %d vulnerable classes\n", len(vulnFiles))
+					finder.Println("Run the following to remove them:")
 
 					var f *os.File
 					if c.IsSet("output") {
@@ -174,15 +179,15 @@ func main() {
 					}
 
 					for _, filepath := range vulnFiles {
-						fmt.Printf("\t log4fix fix %s --overwrite\n", filepath)
+						finder.Printf("\t log4fix fix %s --overwrite\n", filepath)
 
 						if f != nil {
 							f.WriteString(filepath + "\n")
 						}
 					}
 
-					fmt.Println("Or run this command with flag --fix")
-					fmt.Println()
+					finder.Println("Or run this command with flag --fix")
+					finder.Println("")
 				}
 
 			},
