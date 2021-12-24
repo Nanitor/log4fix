@@ -33,8 +33,8 @@ func Silent() {
 	WarningLogger.SetOutput(ioutil.Discard)
 }
 
-func ShouldSuppressLogging(shouldSuppress bool) {
-	suppress = shouldSuppress
+func ShouldQuietLogging(shouldQuiet bool) {
+	quiet = shouldQuiet
 }
 
 type LiveLogger struct {
@@ -42,7 +42,7 @@ type LiveLogger struct {
 }
 
 var IOLogger LiveLogger
-var suppress = false
+var quiet = false
 
 func (l *LiveLogger) Init() {
 	l.Writer = goterminal.New(os.Stdout)
@@ -56,7 +56,7 @@ func (l *LiveLogger) Close() {
 }
 
 func (l *LiveLogger) Printf(text string, args ...interface{}) {
-	if suppress {
+	if quiet {
 		return
 	}
 	if l.Writer == nil {
@@ -68,7 +68,7 @@ func (l *LiveLogger) Printf(text string, args ...interface{}) {
 }
 
 func (l *LiveLogger) Println(text string) {
-	if suppress {
+	if quiet {
 		return
 	}
 	if l.Writer == nil {
@@ -80,14 +80,14 @@ func (l *LiveLogger) Println(text string) {
 }
 
 func Printf(text string, args ...interface{}) {
-	if suppress {
+	if quiet {
 		return
 	}
 	fmt.Printf(text, args...)
 }
 
 func Println(text string) {
-	if suppress {
+	if quiet {
 		return
 	}
 	fmt.Println(text)

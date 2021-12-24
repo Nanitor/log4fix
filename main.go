@@ -106,8 +106,8 @@ func main() {
 					Usage: "If present non-silence the logs.",
 				},
 				&cli.BoolFlag{
-					Name:  "suppress",
-					Usage: "Suppresses logging.",
+					Name:  "quiet",
+					Usage: "No logging to stdout.",
 				},
 			},
 			Action: func(c *cli.Context) {
@@ -119,7 +119,7 @@ func main() {
 					finder.Silent()
 				}
 
-				finder.ShouldSuppressLogging(c.Bool("suppress"))
+				finder.ShouldQuietLogging(c.Bool("quiet"))
 
 				rootDirs := []string{c.Args().First()}
 				rootDirs = append(rootDirs, c.Args().Tail()...)
